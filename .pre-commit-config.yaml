@@ -1,0 +1,21 @@
+repos:
+  # 1. Standard "housekeeping" hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace   # Trims spaces at end of lines
+      - id: end-of-file-fixer     # Ensures file ends with a newline
+      - id: check-yaml            # Checks if .yaml files are valid
+      - id: check-added-large-files
+
+  # 2. Black (The Auto-Formatter) - This FIXES your code
+  - repo: https://github.com/psf/black
+    rev: 24.2.0
+    hooks:
+      - id: black
+
+  # 3. Flake8 (The Checker) - This WARNS you about bad style
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
