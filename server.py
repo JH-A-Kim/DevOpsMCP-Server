@@ -4,7 +4,7 @@ app = FastMCP("Local Infrastrcture Auditor", "1.0.0")
 
 
 @app.tool()
-def basic_test(name: str):
+def basic_greeting_test(name: str):
     """
     Test tool so I can test that this can properly be called
     from the client. (Claude Desktop)
