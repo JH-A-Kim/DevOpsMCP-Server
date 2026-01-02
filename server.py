@@ -15,5 +15,13 @@ def basic_greeting_test(name: str):
     return f"Hello, {name}!"
 
 
+@app.tool()
+def validate_docker_file():
+    """
+    Validates a docker file and checks for best practices.
+    """
+    pass
+
+
 if __name__ == "__main__":
     app.run(transport="stdio")
