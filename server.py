@@ -16,7 +16,7 @@ def basic_greeting_test(name: str):
 
 
 @app.tool()
-def validate_docker_file():
+def validate_dockerfile():
     """
     Validates a docker file and checks for best practices.
     """
