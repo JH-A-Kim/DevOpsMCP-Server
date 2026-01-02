@@ -1,6 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 
-app = FastMCP("Local Infrastrcture Auditor", "1.0.0")
+app = FastMCP("Local Infrastructure Auditor", "1.0.0")
 
 
 @app.tool()
