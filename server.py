@@ -1,4 +1,5 @@
 from mcp.server.fastmcp import FastMCP
+import subprocess  # for running commands in terminal
 
 app = FastMCP("Local Infrastructure Auditor", "1.0.0")
 
@@ -16,11 +17,34 @@ def basic_greeting_test(name: str):
 
 
 @app.tool()
-def validate_dockerfile():
+def validate_dockerfile(path: str):
     """
     Validates a docker file and checks for best practices.
+    Uses 'hadolint' to validate the given Dockerfile.
+    This looks for Security risks and best practices in the actual Dockerfile.
+
+    Args:
+        path (str): Path to the Dockerfile.
     """
-    pass
+
+    try:
+        if path == "":
+            return "Error: No path provided."
+
+        outcome = subprocess.run(["hadolint", path], capture_output=True, text=True)
+
+        if outcome.returncode == 0:
+            return "Dockerfile is valid and follows best practices."
+        elif outcome.stderr:
+            return f"Dockerfile errors found:\n{outcome.stderr}"
+        else:
+            return f"Dockerfile issues found:\n{outcome.stdout}"
+
+    except Exception as e:
+        return (
+            f"Error: {e} or 'hadolint' is not installed or an error "
+            "occurred while validating the Dockerfile."
+        )
 
 
 if __name__ == "__main__":
