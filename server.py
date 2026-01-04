@@ -1,5 +1,6 @@
 from mcp.server.fastmcp import FastMCP
 import subprocess  # for running commands in terminal
+import os
 
 app = FastMCP("Local Infrastructure Auditor", "1.0.0")
 
@@ -31,7 +32,14 @@ def validate_dockerfile(path: str):
         if not path:
             return "Error: No path provided."
 
-        outcome = subprocess.run(["hadolint", path], capture_output=True, text=True)
+        path = os.path.abspath(os.path.expanduser(path))
+
+        if not os.path.isfile(path):
+            return f"Error: The file at path '{path}' does not exist."
+
+        outcome = subprocess.run(
+            ["hadolint", path], capture_output=True, text=True, timeout=10
+        )
 
         if outcome.returncode == 0:
             return "Dockerfile is valid and follows best practices."
@@ -45,6 +53,8 @@ def validate_dockerfile(path: str):
             "Error: 'hadolint' is not installed or not found in PATH. "
             "Please install hadolint to validate Dockerfiles."
         )
+    except subprocess.TimeoutExpired:
+        return "Error: Validation process timed out."
     except Exception as e:
         return f"Unexpected error while validating the Dockerfile: {e}"
 
