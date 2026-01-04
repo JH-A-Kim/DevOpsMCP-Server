@@ -37,7 +37,10 @@ sequenceDiagram
 ## Installation Instructions
     1. To use validate_dockerfile() you need to first download hadolint. To download run the command:
 
-    if you have homebrew/LinuxBrew installed.
+    If you have homebrew/LinuxBrew installed.
     ```
     brew install hadolint
     ```
+
+    Otherwise download from the official hadolint website:
+    https://hadolint.com/
