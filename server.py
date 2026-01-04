@@ -19,7 +19,7 @@ def basic_greeting_test(name: str):
 @app.tool()
 def validate_dockerfile(path: str):
     """
-    Validates a docker file and checks for best practices.
+    Validates a Dockerfile and checks for best practices.
     Uses 'hadolint' to validate the given Dockerfile.
     This looks for Security risks and best practices in the actual Dockerfile.
 
