@@ -32,3 +32,12 @@ sequenceDiagram
     CLI-->>MCP: Return: Warning DL3007 (Using latest tag)
     MCP-->>LLM: Return Tool Result
     LLM-->>User: "You are using the 'latest' tag. Here is why that is risky..."
+```
+
+## Installation Instructions
+    1. To use validate_dockerfile() you need to first download hadolint. To download run the command:
+
+    if you have homebrew/LinuxBrew installed.
+    ```
+    brew install hadolint
+    ```
