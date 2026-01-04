@@ -40,11 +40,13 @@ def validate_dockerfile(path: str):
         else:
             return f"Dockerfile issues found:\n{outcome.stdout}"
 
-    except Exception as e:
+    except FileNotFoundError:
         return (
-            f"Error: {e} or 'hadolint' is not installed or an error "
-            "occurred while validating the Dockerfile."
+            "Error: 'hadolint' is not installed or not found in PATH. "
+            "Please install hadolint to validate Dockerfiles."
         )
+    except Exception as e:
+        return f"Unexpected error while validating the Dockerfile: {e}"
 
 
 if __name__ == "__main__":
