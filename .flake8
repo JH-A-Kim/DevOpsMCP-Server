@@ -1,0 +1,8 @@
+[flake8]
+
+# flake configuration settings
+max-line-length = 88 # match black
+
+extend-ignore =
+    E203,  # whitespace before ':'
+    W503   # line break before binary operator
