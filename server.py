@@ -21,7 +21,7 @@ def validate_dockerfile(path: str):
     """
     Validates a Dockerfile and checks for best practices.
     Uses 'hadolint' to validate the given Dockerfile.
-    This looks for Security risks and best practices in the actual Dockerfile.
+    This looks for security risks and best practices in the actual Dockerfile.
 
     Args:
         path (str): Path to the Dockerfile.
