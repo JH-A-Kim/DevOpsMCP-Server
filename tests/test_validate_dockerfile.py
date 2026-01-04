@@ -29,6 +29,28 @@ class TestValidateDockerfile(unittest.TestCase):
         result = validate_dockerfile("path/to/issue/Dockerfile")
         self.assertEqual(result, "Dockerfile issues found:\nWarning: Use of latest tag")
 
+    @patch("server.subprocess.run", side_effect=FileNotFoundError)
+    def test_validate_dockerfile_hadolint_not_found(self, mock_run):
+        result = validate_dockerfile("path/to/Dockerfile")
+        self.assertEqual(
+            result,
+            "Error: 'hadolint' is not installed or not found in PATH. "
+            "Please install hadolint to validate Dockerfiles.",
+        )
+
+    @patch("server.subprocess.run", side_effect=Exception("Some unexpected error"))
+    def test_validate_dockerfile_hadolint_unexpected_error(self, mock_run):
+        result = validate_dockerfile("path/to/Dockerfile")
+        self.assertEqual(
+            result,
+            "Unexpected error while validating the Dockerfile: Some unexpected error",
+        )
+
+    @patch("server.subprocess.run")
+    def test_validate_dockerfile_no_path(self, mock_run):
+        result = validate_dockerfile("")
+        self.assertEqual(result, "Error: No path provided.")
+
 
 if __name__ == "__main__":
     unittest.main()
