@@ -28,7 +28,7 @@ def validate_dockerfile(path: str):
     """
 
     try:
-        if path == "":
+        if not path:
             return "Error: No path provided."
 
         outcome = subprocess.run(["hadolint", path], capture_output=True, text=True)
