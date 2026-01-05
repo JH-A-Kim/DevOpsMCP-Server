@@ -4,6 +4,8 @@ import os
 
 app = FastMCP("Local Infrastructure Auditor", "1.0.0")
 
+timeout = 30
+
 
 @app.tool()
 def basic_greeting_test(name: str):
@@ -38,7 +40,7 @@ def validate_dockerfile(path: str):
             return f"Error: The file at path '{path}' does not exist."
 
         outcome = subprocess.run(
-            ["hadolint", path], capture_output=True, text=True, timeout=10
+            ["hadolint", path], capture_output=True, text=True, timeout_time=timeout
         )
 
         if outcome.returncode == 0:
@@ -69,7 +71,36 @@ def scan_iac(directory_path: str):
     Args:
         directory_path (str): Path to the directory containing IaC files.
     """
-    pass
+
+    try:
+        if not directory_path:
+            return "Error: No directory path provided."
+
+        directory_path = os.path.abspath(os.path.expanduser(directory_path))
+
+        if not os.path.isdir(directory_path):
+            return f"Error: The directory at path '{directory_path}' does not exist."
+
+        outcome = subprocess.run(
+            ["checkov", "-d", directory_path],
+            capture_output=True,
+            text=True,
+            timeout_time=timeout,
+        )
+
+        if outcome.returncode == 0:
+            return "No security issues found in IaC files."
+        else:
+            return f"IaC security issues found:\n{outcome.stdout}"
+    except FileNotFoundError:
+        return (
+            "Error: 'checkov' is not installed or not found in PATH. "
+            "Please install checkov to scan IaC files."
+        )
+    except subprocess.TimeoutExpired:
+        return "Error: Scanning process timed out."
+    except Exception as e:
+        return f"Unexpected error while scanning IaC files: {e}"
 
 
 if __name__ == "__main__":
