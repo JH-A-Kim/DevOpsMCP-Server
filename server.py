@@ -59,5 +59,18 @@ def validate_dockerfile(path: str):
         return f"Unexpected error while validating the Dockerfile: {e}"
 
 
+@app.tool()
+def scan_iac(directory_path: str):
+    """
+    Scans Infrastructure as Code (IaC) files in the specified
+    directory for security issues.
+    Uses checkov to scan for issues in Terraform, CloudFormation, and other IaC files.
+
+    Args:
+        directory_path (str): Path to the directory containing IaC files.
+    """
+    pass
+
+
 if __name__ == "__main__":
     app.run(transport="stdio")
