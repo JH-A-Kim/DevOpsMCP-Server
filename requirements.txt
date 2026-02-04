@@ -20,6 +20,7 @@ mcp==1.25.0
 nodeenv==1.10.0
 platformdirs==4.5.1
 pre_commit==4.5.1
+psutil==6.1.1
 pycparser==2.23
 pydantic==2.12.5
 pydantic-settings==2.12.0
