@@ -21,7 +21,7 @@ class TestSystemInfo(unittest.TestCase):
     def test_get_system_info(self):
         result = get_system_info()
         self.assertIn("System Information", result)
-        self.assertIn("Os:", result)
+        self.assertIn("OS:", result)
         self.assertIn("Hostname:", result)
         self.assertIn("Uptime:", result)
 
