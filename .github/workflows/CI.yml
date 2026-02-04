@@ -1,6 +1,6 @@
 name: CI Pipeline
 
-on: 
+on:
     push:
         branches:
             - main
@@ -57,7 +57,7 @@ jobs:
     security:
         name: Security Scan
         runs-on: ubuntu-latest
-        steps: 
+        steps:
             - name: Checkout repository
               uses: actions/checkout@v4
 

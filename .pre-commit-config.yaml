@@ -13,6 +13,7 @@ repos:
     rev: 24.2.0
     hooks:
       - id: black
+        args: [--line-length=160]
 
   # 3. Flake8 (The Checker) - This WARNS you about bad style
   - repo: https://github.com/pycqa/flake8
