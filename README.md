@@ -1,5 +1,3 @@
-# DevOpsMCP-Server
-
 # DevOps Diagnostics Server (MCP Server)
 
 > **A comprehensive DevOps companion that connects LLMs directly to your local infrastructure and system diagnostics tooling.**
