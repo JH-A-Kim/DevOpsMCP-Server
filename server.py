@@ -1221,6 +1221,8 @@ def list_gcp_instances(project_id: str, zone: str = None):
                 result += f"Status: {instance.status}\n"
 
                 # Network interfaces
+                # Note: network_i_p and nat_i_p are correct attribute names
+                # from GCP SDK (protobuf-generated code uses unconventional naming)
                 if instance.network_interfaces:
                     for interface in instance.network_interfaces:
                         result += f"Internal IP: {interface.network_i_p}\n"
@@ -1248,6 +1250,7 @@ def list_gcp_instances(project_id: str, zone: str = None):
                     result += f"Machine Type: {instance.machine_type.split('/')[-1]}\n"
                     result += f"Status: {instance.status}\n"
 
+                    # Note: network_i_p is the correct attribute name from GCP SDK
                     if instance.network_interfaces:
                         for interface in instance.network_interfaces:
                             result += f"Internal IP: {interface.network_i_p}\n"
