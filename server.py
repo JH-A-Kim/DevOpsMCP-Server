@@ -5,7 +5,6 @@ import platform
 import psutil
 import socket
 from datetime import datetime
-import json
 
 # Optional imports for cloud providers and containerization
 try:
@@ -522,7 +521,9 @@ def list_docker_containers(all_containers: bool = False):
             result += f"ID: {container.short_id}\n"
             result += f"Name: {container.name}\n"
             result += f"Status: {container.status}\n"
-            result += f"Image: {container.image.tags[0] if container.image.tags else container.image.short_id}\n"
+            image_tag = (container.image.tags[0] if container.image.tags
+                         else container.image.short_id)
+            result += f"Image: {image_tag}\n"
             result += f"Created: {container.attrs['Created'][:19]}\n"
             result += "-" * 60 + "\n"
 
@@ -573,7 +574,9 @@ def inspect_docker_container(container_id: str):
         if port_bindings:
             for container_port, host_bindings in port_bindings.items():
                 for binding in host_bindings or []:
-                    result += f"{container_port} -> {binding.get('HostIp', '0.0.0.0')}:{binding.get('HostPort', 'N/A')}\n"
+                    host_ip = binding.get('HostIp', '0.0.0.0')
+                    host_port = binding.get('HostPort', 'N/A')
+                    result += f"{container_port} -> {host_ip}:{host_port}\n"
         else:
             result += "No port bindings\n"
 
@@ -582,7 +585,10 @@ def inspect_docker_container(container_id: str):
         mounts = attrs.get('Mounts', [])
         if mounts:
             for mount in mounts:
-                result += f"{mount.get('Type', 'unknown')}: {mount.get('Source', 'N/A')} -> {mount.get('Destination', 'N/A')}\n"
+                mount_type = mount.get('Type', 'unknown')
+                mount_src = mount.get('Source', 'N/A')
+                mount_dst = mount.get('Destination', 'N/A')
+                result += f"{mount_type}: {mount_src} -> {mount_dst}\n"
         else:
             result += "No mounts\n"
 
@@ -661,10 +667,13 @@ def get_docker_stats(container_id: str):
         result = f"=== Container Stats: {container.name} ===\n\n"
 
         # CPU stats
-        cpu_delta = stats['cpu_stats']['cpu_usage']['total_usage'] - \
-                   stats['precpu_stats']['cpu_usage']['total_usage']
-        system_delta = stats['cpu_stats']['system_cpu_usage'] - \
-                      stats['precpu_stats']['system_cpu_usage']
+        cpu_usage_total = stats['cpu_stats']['cpu_usage']['total_usage']
+        precpu_usage = stats['precpu_stats']['cpu_usage']['total_usage']
+        cpu_delta = cpu_usage_total - precpu_usage
+
+        system_cpu = stats['cpu_stats']['system_cpu_usage']
+        presystem_cpu = stats['precpu_stats']['system_cpu_usage']
+        system_delta = system_cpu - presystem_cpu
         cpu_count = stats['cpu_stats'].get('online_cpus', 1)
 
         cpu_percent = 0.0
@@ -1289,7 +1298,7 @@ def scan_with_trivy(target: str, scan_type: str = "image"):
             cmd, capture_output=True, text=True, timeout=120
         )
 
-        result = f"=== Trivy Security Scan ===\n"
+        result = "=== Trivy Security Scan ===\n"
         result += f"Target: {target}\n"
         result += f"Scan Type: {scan_type}\n\n"
 
@@ -1340,7 +1349,7 @@ def scan_with_grype(target: str):
             cmd, capture_output=True, text=True, timeout=120
         )
 
-        result = f"=== Grype Vulnerability Scan ===\n"
+        result = "=== Grype Vulnerability Scan ===\n"
         result += f"Target: {target}\n\n"
 
         if result_cmd.returncode == 0:
@@ -1798,7 +1807,6 @@ def optimize_dockerfile(dockerfile_path: str):
 
         with open(dockerfile_path, 'r') as f:
             content = f.read()
-            lines = content.split('\n')
 
         result = f"=== Dockerfile Optimization Suggestions: {dockerfile_path} ===\n\n"
 
@@ -1881,8 +1889,10 @@ def optimize_dockerfile(dockerfile_path: str):
         # Display suggestions
         if suggestions:
             for i, suggestion in enumerate(suggestions, 1):
-                result += f"{i}. [{suggestion['category']}] {suggestion['suggestion']}\n"
-                result += f"   Example:\n"
+                category = suggestion['category']
+                sug_text = suggestion['suggestion']
+                result += f"{i}. [{category}] {sug_text}\n"
+                result += "   Example:\n"
                 for line in suggestion['example'].split('\n'):
                     result += f"     {line}\n"
                 result += "\n"

@@ -71,6 +71,12 @@ sequenceDiagram
 ### Prerequisites
 - Python 3.8+
 - pip (Python package manager)
+- Docker (optional, for container management tools)
+- kubectl (optional, for Kubernetes diagnostics)
+- Cloud CLI tools (optional, for cloud provider integration)
+  - AWS CLI (for AWS tools)
+  - Azure CLI (for Azure tools)
+  - gcloud CLI (for GCP tools)
 
 ### Install Dependencies
 
@@ -83,17 +89,47 @@ cd DevOpsMCP-Server
 pip install -r requirements.txt
 ```
 
-### Optional: Install hadolint for Dockerfile validation
+### Optional Tools
 
-If you want to use `validate_dockerfile()` tool, install hadolint:
-
-**Using Homebrew/LinuxBrew:**
+**For Dockerfile validation:**
 ```bash
+# Install hadolint
 brew install hadolint
+# Or download from: https://hadolint.com/
 ```
 
-**Or download from:**
-https://hadolint.com/
+**For security scanning:**
+```bash
+# Install Trivy
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+# Install Grype
+curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+```
+
+**For Docker integration:**
+```bash
+# Ensure Docker is installed and running
+docker --version
+```
+
+**For Kubernetes integration:**
+```bash
+# Ensure kubectl is installed and configured
+kubectl version --client
+```
+
+**For cloud provider integration:**
+```bash
+# AWS: Configure credentials
+aws configure
+
+# Azure: Login
+az login
+
+# GCP: Set up authentication
+gcloud auth application-default login
+```
 
 ---
 
@@ -131,6 +167,42 @@ The server runs using stdio transport and can be integrated with MCP clients lik
 ```
 "Validate my Dockerfile for best practices"
 → Runs hadolint and reports security/optimization issues
+```
+
+**Docker Container Management:**
+```
+"List all running Docker containers and show me the logs for container xyz"
+→ Lists containers and retrieves logs for debugging
+```
+
+**Kubernetes Diagnostics:**
+```
+"Show me the status of pods in the production namespace and get logs for the failing pod"
+→ Diagnoses pod issues with events and logs
+```
+
+**Cloud Resource Monitoring:**
+```
+"List all my AWS EC2 instances in us-east-1 and check their status"
+→ Shows cloud infrastructure across providers
+```
+
+**Security Scanning:**
+```
+"Scan my Docker image nginx:latest for vulnerabilities using Trivy"
+→ Identifies security vulnerabilities in container images
+```
+
+**Performance Analysis:**
+```
+"Analyze my system's performance over the last 30 seconds"
+→ Provides CPU, memory, and network trends
+```
+
+**Automated Remediation:**
+```
+"My pod keeps crashing - suggest remediation steps"
+→ Provides detailed troubleshooting guide and solutions
 ```
 
 ---
@@ -260,14 +332,81 @@ See LICENSE file for details.
 
 ---
 
+## 🛠️ Available Tools (Expanded)
+
+### System Monitoring
+- **get_system_info()** - Comprehensive system information (OS, version, uptime, architecture)
+- **get_cpu_usage()** - CPU usage metrics with per-core breakdowns
+- **get_memory_usage()** - RAM and swap memory statistics
+- **get_disk_usage(path)** - Disk space analysis for any path
+
+### Process Management
+- **list_processes(limit)** - List top processes by CPU usage
+- **check_process_running(process_name)** - Verify if a process is running
+
+### Network Diagnostics
+- **check_port_listening(port, host)** - Check if a port is open and which process is using it
+- **get_network_stats()** - Network interface statistics (bytes sent/received, errors)
+
+### Log Analysis
+- **read_log_file(path, lines, search_term)** - Read and filter log files with search capability
+
+### File System Operations
+- **get_directory_size(path)** - Calculate total size of directories
+- **get_environment_variable(var_name)** - Inspect environment variables
+
+### Infrastructure Validation
+- **validate_dockerfile(path)** - Validate Dockerfiles using hadolint
+- **optimize_dockerfile(path)** - Get optimization suggestions for Dockerfiles
+
+### Docker Container Management
+- **list_docker_containers(all_containers)** - List running or all Docker containers
+- **inspect_docker_container(container_id)** - Get detailed container information
+- **get_docker_logs(container_id, lines)** - Retrieve container logs
+- **get_docker_stats(container_id)** - Get container resource usage statistics
+
+### Kubernetes Diagnostics
+- **list_k8s_pods(namespace, all_namespaces)** - List pods in a namespace
+- **get_k8s_pod_logs(pod_name, namespace, container, lines)** - Retrieve pod logs
+- **get_k8s_pod_status(pod_name, namespace)** - Get detailed pod status and events
+- **list_k8s_services(namespace, all_namespaces)** - List Kubernetes services
+- **get_k8s_node_status()** - Get cluster node health and capacity
+
+### Cloud Provider Integration
+- **list_aws_ec2_instances(region, max_results)** - List AWS EC2 instances
+- **get_aws_s3_buckets()** - List all S3 buckets
+- **list_azure_vms(subscription_id, resource_group)** - List Azure Virtual Machines
+- **list_gcp_instances(project_id, zone)** - List GCP Compute Engine instances
+
+### Security Scanning
+- **scan_with_trivy(target, scan_type)** - Scan for vulnerabilities using Trivy
+- **scan_with_grype(target)** - Vulnerability scanning with Grype
+- **scan_secrets(path, max_depth)** - Scan for exposed secrets in code
+
+### Performance Profiling
+- **get_io_stats()** - Get disk I/O statistics for all devices
+- **analyze_performance_metrics(duration)** - Comprehensive performance analysis over time
+
+### Automated Remediation
+- **suggest_remediation(issue_type, details)** - Get remediation suggestions for common issues
+
+---
+
 ## 🛣️ Roadmap
 
-Future enhancements may include:
-- Docker container inspection and management
-- Kubernetes cluster diagnostics
-- Cloud provider integration (AWS, Azure, GCP)
-- Security scanning with additional tools (Trivy, Grype)
-- Performance profiling capabilities
-- Automated remediation suggestions
+**Completed in v3.0.0:**
+- ✅ Docker container inspection and management
+- ✅ Kubernetes cluster diagnostics
+- ✅ Cloud provider integration (AWS, Azure, GCP)
+- ✅ Security scanning with additional tools (Trivy, Grype)
+- ✅ Performance profiling capabilities
+- ✅ Automated remediation suggestions
+
+**Future enhancements:**
+- Advanced container orchestration features
+- Multi-cloud resource management
+- Automated vulnerability remediation
+- Integration with CI/CD pipelines
+- Real-time monitoring dashboards
 
 ---
