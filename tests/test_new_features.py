@@ -1,7 +1,7 @@
 import unittest
 import os
 import tempfile
-from unittest.mock import patch, MagicMock, Mock
+from unittest.mock import patch, MagicMock
 from server import (
     # Docker tools
     list_docker_containers,
@@ -11,9 +11,7 @@ from server import (
     # Kubernetes tools
     list_k8s_pods,
     get_k8s_pod_logs,
-    get_k8s_pod_status,
     list_k8s_services,
-    get_k8s_node_status,
     # Cloud provider tools
     list_aws_ec2_instances,
     get_aws_s3_buckets,
@@ -81,20 +79,10 @@ class TestDockerContainers(unittest.TestCase):
         mock_container.status = "running"
         mock_container.attrs = {
             "Created": "2024-01-01T00:00:00",
-            "Config": {
-                "Image": "nginx:latest",
-                "Env": ["PATH=/usr/bin", "HOME=/root"]
-            },
-            "NetworkSettings": {
-                "Networks": {
-                    "bridge": {
-                        "IPAddress": "172.17.0.2",
-                        "Gateway": "172.17.0.1"
-                    }
-                }
-            },
+            "Config": {"Image": "nginx:latest", "Env": ["PATH=/usr/bin", "HOME=/root"]},
+            "NetworkSettings": {"Networks": {"bridge": {"IPAddress": "172.17.0.2", "Gateway": "172.17.0.1"}}},
             "HostConfig": {"PortBindings": {}},
-            "Mounts": []
+            "Mounts": [],
         }
 
         mock_client = MagicMock()
@@ -131,28 +119,20 @@ class TestDockerContainers(unittest.TestCase):
             "cpu_stats": {
                 "cpu_usage": {"total_usage": 1000000},
                 "system_cpu_usage": 10000000,
-                "online_cpus": 2
+                "online_cpus": 2,
             },
             "precpu_stats": {
                 "cpu_usage": {"total_usage": 500000},
-                "system_cpu_usage": 9000000
+                "system_cpu_usage": 9000000,
             },
-            "memory_stats": {
-                "usage": 104857600,
-                "limit": 1073741824
-            },
-            "networks": {
-                "eth0": {
-                    "rx_bytes": 1048576,
-                    "tx_bytes": 524288
-                }
-            },
+            "memory_stats": {"usage": 104857600, "limit": 1073741824},
+            "networks": {"eth0": {"rx_bytes": 1048576, "tx_bytes": 524288}},
             "blkio_stats": {
                 "io_service_bytes_recursive": [
                     {"op": "Read", "value": 1048576},
-                    {"op": "Write", "value": 524288}
+                    {"op": "Write", "value": 524288},
                 ]
-            }
+            },
         }
 
         mock_client = MagicMock()
@@ -186,9 +166,7 @@ class TestKubernetes(unittest.TestCase):
         mock_pod.status.phase = "Running"
         mock_pod.spec.node_name = "node-1"
         mock_pod.status.pod_ip = "10.0.0.1"
-        mock_pod.status.container_statuses = [
-            MagicMock(name="app", ready=True, restart_count=0)
-        ]
+        mock_pod.status.container_statuses = [MagicMock(name="app", ready=True, restart_count=0)]
 
         mock_list = MagicMock()
         mock_list.items = [mock_pod]
@@ -223,9 +201,7 @@ class TestKubernetes(unittest.TestCase):
         mock_svc.metadata.namespace = "default"
         mock_svc.spec.type = "ClusterIP"
         mock_svc.spec.cluster_ip = "10.0.0.100"
-        mock_svc.spec.ports = [
-            MagicMock(name="http", port=80, target_port=8080, protocol="TCP")
-        ]
+        mock_svc.spec.ports = [MagicMock(name="http", port=80, target_port=8080, protocol="TCP")]
         mock_svc.status.load_balancer.ingress = None
 
         mock_list = MagicMock()
@@ -267,7 +243,7 @@ class TestCloudProviders(unittest.TestCase):
                             "PrivateIpAddress": "10.0.0.1",
                             "PublicIpAddress": "54.1.2.3",
                             "LaunchTime": "2024-01-01T00:00:00",
-                            "Tags": [{"Key": "Name", "Value": "test-instance"}]
+                            "Tags": [{"Key": "Name", "Value": "test-instance"}],
                         }
                     ]
                 }
@@ -285,14 +261,7 @@ class TestCloudProviders(unittest.TestCase):
     @patch("server.boto3.client")
     def test_get_aws_s3_buckets(self, mock_boto):
         mock_s3 = MagicMock()
-        mock_s3.list_buckets.return_value = {
-            "Buckets": [
-                {
-                    "Name": "my-bucket",
-                    "CreationDate": "2024-01-01T00:00:00"
-                }
-            ]
-        }
+        mock_s3.list_buckets.return_value = {"Buckets": [{"Name": "my-bucket", "CreationDate": "2024-01-01T00:00:00"}]}
         mock_boto.return_value = mock_s3
 
         result = get_aws_s3_buckets()
@@ -327,10 +296,7 @@ class TestSecurityScanning(unittest.TestCase):
         # First call checks if trivy is installed
         check_result = MagicMock(returncode=0)
         # Second call runs the scan
-        scan_result = MagicMock(
-            returncode=0,
-            stdout="Total: 0 (HIGH: 0, CRITICAL: 0)"
-        )
+        scan_result = MagicMock(returncode=0, stdout="Total: 0 (HIGH: 0, CRITICAL: 0)")
         mock_run.side_effect = [check_result, scan_result]
 
         result = scan_with_trivy("nginx:latest")
@@ -348,7 +314,7 @@ class TestSecurityScanning(unittest.TestCase):
         self.assertIn("does not exist", result)
 
     def test_scan_secrets_in_temp_file(self):
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             f.write("api_key = 'AKIAIOSFODNN7EXAMPLE'\n")
             f.write("secret = 'my_secret_password_1234567890'\n")
             temp_path = f.name
@@ -432,7 +398,7 @@ class TestAutomatedRemediation(unittest.TestCase):
         self.assertIn("does not exist", result)
 
     def test_optimize_dockerfile_suggestions(self):
-        with tempfile.NamedTemporaryFile(mode='w', suffix='Dockerfile', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix="Dockerfile", delete=False) as f:
             f.write("FROM node:latest\n")
             f.write("COPY . /app\n")
             f.write("RUN apt-get update\n")
@@ -448,7 +414,7 @@ class TestAutomatedRemediation(unittest.TestCase):
             os.unlink(temp_path)
 
     def test_optimize_dockerfile_good_practices(self):
-        with tempfile.NamedTemporaryFile(mode='w', suffix='Dockerfile', delete=False) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix="Dockerfile", delete=False) as f:
             f.write("FROM node:16-alpine AS builder\n")
             f.write("WORKDIR /app\n")
             f.write("COPY package*.json ./\n")

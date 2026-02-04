@@ -52,7 +52,7 @@ Basic Dockerfile validation with hadolint.
 
 ### System Monitoring Tools (3 tools)
 - **get_cpu_usage()** - Monitor CPU usage with per-core breakdowns
-- **get_memory_usage()** - Track RAM and swap memory statistics  
+- **get_memory_usage()** - Track RAM and swap memory statistics
 - **get_disk_usage(path)** - Analyze disk space usage for any path
 
 ### Process Management Tools (2 tools)
@@ -197,6 +197,6 @@ To use v3.0.0 features:
 
 ---
 
-**Version:** 3.0.0  
-**Previous Version:** 2.0.0  
+**Version:** 3.0.0
+**Previous Version:** 2.0.0
 **Date:** 2026-02-04

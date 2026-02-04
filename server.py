@@ -9,18 +9,21 @@ from datetime import datetime
 # Optional imports for cloud providers and containerization
 try:
     import docker
+
     DOCKER_AVAILABLE = True
 except ImportError:
     DOCKER_AVAILABLE = False
 
 try:
     from kubernetes import client, config
+
     KUBERNETES_AVAILABLE = True
 except ImportError:
     KUBERNETES_AVAILABLE = False
 
 try:
     import boto3
+
     AWS_AVAILABLE = True
 except ImportError:
     AWS_AVAILABLE = False
@@ -28,12 +31,14 @@ except ImportError:
 try:
     from azure.identity import DefaultAzureCredential
     from azure.mgmt.compute import ComputeManagementClient
+
     AZURE_AVAILABLE = True
 except ImportError:
     AZURE_AVAILABLE = False
 
 try:
     from google.cloud import compute_v1
+
     GCP_AVAILABLE = True
 except ImportError:
     GCP_AVAILABLE = False
@@ -73,9 +78,7 @@ def validate_dockerfile(path: str):
         if not os.path.isfile(path):
             return f"Error: The file at path '{path}' does not exist."
 
-        outcome = subprocess.run(
-            ["hadolint", path], capture_output=True, text=True, timeout=10
-        )
+        outcome = subprocess.run(["hadolint", path], capture_output=True, text=True, timeout=10)
 
         if outcome.returncode == 0:
             return "Dockerfile is valid and follows best practices."
@@ -85,10 +88,7 @@ def validate_dockerfile(path: str):
             return f"Dockerfile issues found:\n{outcome.stdout}"
 
     except FileNotFoundError:
-        return (
-            "Error: 'hadolint' is not installed or not found in PATH. "
-            "Please install hadolint to validate Dockerfiles."
-        )
+        return "Error: 'hadolint' is not installed or not found in PATH. " "Please install hadolint to validate Dockerfiles."
     except subprocess.TimeoutExpired:
         return "Error: Validation process timed out."
     except Exception as e:
@@ -235,9 +235,7 @@ def list_processes(limit: int = 10):
     """
     try:
         processes = []
-        for proc in psutil.process_iter(
-            ["pid", "name", "cpu_percent", "memory_percent"]
-        ):
+        for proc in psutil.process_iter(["pid", "name", "cpu_percent", "memory_percent"]):
             try:
                 processes.append(proc.info)
             except (psutil.NoSuchProcess, psutil.AccessDenied):
@@ -276,14 +274,8 @@ def check_process_running(process_name: str):
         matching_processes = []
         for proc in psutil.process_iter(["pid", "name", "cmdline"]):
             try:
-                if process_name.lower() in proc.info["name"].lower() or any(
-                    process_name.lower() in arg.lower()
-                    for arg in proc.info.get("cmdline", [])
-                    if arg
-                ):
-                    matching_processes.append(
-                        {"pid": proc.info["pid"], "name": proc.info["name"]}
-                    )
+                if process_name.lower() in proc.info["name"].lower() or any(process_name.lower() in arg.lower() for arg in proc.info.get("cmdline", []) if arg):
+                    matching_processes.append({"pid": proc.info["pid"], "name": proc.info["name"]})
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
 
@@ -328,9 +320,7 @@ def check_port_listening(port: int, host: str = "127.0.0.1"):
                         }
                     )
                 except (psutil.NoSuchProcess, psutil.AccessDenied):
-                    port_info.append(
-                        {"pid": conn.pid, "status": conn.status, "process": "Unknown"}
-                    )
+                    port_info.append({"pid": conn.pid, "status": conn.status, "process": "Unknown"})
 
         if port_info:
             result = f"Port {port} is LISTENING\n\n"
@@ -406,10 +396,7 @@ def read_log_file(file_path: str, lines: int = 50, search_term: str = None):
         # Check file size to prevent reading massive files
         file_size = os.path.getsize(file_path)
         if file_size > 10 * 1024 * 1024:  # 10 MB limit
-            return (
-                f"Error: File size ({file_size / (1024**2):.2f} MB) exceeds "
-                "10 MB limit. Please use a more specific search or smaller file."
-            )
+            return f"Error: File size ({file_size / (1024**2):.2f} MB) exceeds " "10 MB limit. Please use a more specific search or smaller file."
 
         with open(file_path, "r", encoding="utf-8", errors="replace") as f:
             all_lines = f.readlines()
@@ -417,14 +404,8 @@ def read_log_file(file_path: str, lines: int = 50, search_term: str = None):
         # Filter if search term provided
         if search_term:
             filtered_lines = [line for line in all_lines if search_term in line]
-            result_lines = (
-                filtered_lines[-lines:]
-                if len(filtered_lines) > lines
-                else filtered_lines
-            )
-            result = (
-                f"=== Last {len(result_lines)} matching lines from {file_path} ===\n"
-            )
+            result_lines = filtered_lines[-lines:] if len(filtered_lines) > lines else filtered_lines
+            result = f"=== Last {len(result_lines)} matching lines from {file_path} ===\n"
             result += f"(Search term: '{search_term}')\n\n"
         else:
             result_lines = all_lines[-lines:] if len(all_lines) > lines else all_lines
@@ -521,8 +502,7 @@ def list_docker_containers(all_containers: bool = False):
             result += f"ID: {container.short_id}\n"
             result += f"Name: {container.name}\n"
             result += f"Status: {container.status}\n"
-            image_tag = (container.image.tags[0] if container.image.tags
-                         else container.image.short_id)
+            image_tag = container.image.tags[0] if container.image.tags else container.image.short_id
             result += f"Image: {image_tag}\n"
             result += f"Created: {container.attrs['Created'][:19]}\n"
             result += "-" * 60 + "\n"
@@ -562,7 +542,7 @@ def inspect_docker_container(container_id: str):
 
         # Network information
         result += "\n--- Network Settings ---\n"
-        networks = attrs.get('NetworkSettings', {}).get('Networks', {})
+        networks = attrs.get("NetworkSettings", {}).get("Networks", {})
         for net_name, net_info in networks.items():
             result += f"Network: {net_name}\n"
             result += f"  IP Address: {net_info.get('IPAddress', 'N/A')}\n"
@@ -570,31 +550,31 @@ def inspect_docker_container(container_id: str):
 
         # Port bindings
         result += "\n--- Port Bindings ---\n"
-        port_bindings = attrs.get('HostConfig', {}).get('PortBindings', {})
+        port_bindings = attrs.get("HostConfig", {}).get("PortBindings", {})
         if port_bindings:
             for container_port, host_bindings in port_bindings.items():
                 for binding in host_bindings or []:
-                    host_ip = binding.get('HostIp', '0.0.0.0')
-                    host_port = binding.get('HostPort', 'N/A')
+                    host_ip = binding.get("HostIp", "0.0.0.0")
+                    host_port = binding.get("HostPort", "N/A")
                     result += f"{container_port} -> {host_ip}:{host_port}\n"
         else:
             result += "No port bindings\n"
 
         # Mounts
         result += "\n--- Mounts ---\n"
-        mounts = attrs.get('Mounts', [])
+        mounts = attrs.get("Mounts", [])
         if mounts:
             for mount in mounts:
-                mount_type = mount.get('Type', 'unknown')
-                mount_src = mount.get('Source', 'N/A')
-                mount_dst = mount.get('Destination', 'N/A')
+                mount_type = mount.get("Type", "unknown")
+                mount_src = mount.get("Source", "N/A")
+                mount_dst = mount.get("Destination", "N/A")
                 result += f"{mount_type}: {mount_src} -> {mount_dst}\n"
         else:
             result += "No mounts\n"
 
         # Environment variables (first 10)
         result += "\n--- Environment (first 10) ---\n"
-        env_vars = attrs.get('Config', {}).get('Env', [])
+        env_vars = attrs.get("Config", {}).get("Env", [])
         for env in env_vars[:10]:
             result += f"{env}\n"
         if len(env_vars) > 10:
@@ -629,7 +609,7 @@ def get_docker_logs(container_id: str, lines: int = 100, follow: bool = False):
         docker_client = docker.from_env()
         container = docker_client.containers.get(container_id)
 
-        logs = container.logs(tail=lines, timestamps=True).decode('utf-8', errors='replace')
+        logs = container.logs(tail=lines, timestamps=True).decode("utf-8", errors="replace")
 
         result = f"=== Docker Logs: {container.name} (last {lines} lines) ===\n\n"
         result += logs
@@ -667,14 +647,14 @@ def get_docker_stats(container_id: str):
         result = f"=== Container Stats: {container.name} ===\n\n"
 
         # CPU stats
-        cpu_usage_total = stats['cpu_stats']['cpu_usage']['total_usage']
-        precpu_usage = stats['precpu_stats']['cpu_usage']['total_usage']
+        cpu_usage_total = stats["cpu_stats"]["cpu_usage"]["total_usage"]
+        precpu_usage = stats["precpu_stats"]["cpu_usage"]["total_usage"]
         cpu_delta = cpu_usage_total - precpu_usage
 
-        system_cpu = stats['cpu_stats']['system_cpu_usage']
-        presystem_cpu = stats['precpu_stats']['system_cpu_usage']
+        system_cpu = stats["cpu_stats"]["system_cpu_usage"]
+        presystem_cpu = stats["precpu_stats"]["system_cpu_usage"]
         system_delta = system_cpu - presystem_cpu
-        cpu_count = stats['cpu_stats'].get('online_cpus', 1)
+        cpu_count = stats["cpu_stats"].get("online_cpus", 1)
 
         cpu_percent = 0.0
         if system_delta > 0 and cpu_delta > 0:
@@ -683,27 +663,27 @@ def get_docker_stats(container_id: str):
         result += f"CPU Usage: {cpu_percent:.2f}%\n"
 
         # Memory stats
-        mem_usage = stats['memory_stats'].get('usage', 0)
-        mem_limit = stats['memory_stats'].get('limit', 1)
+        mem_usage = stats["memory_stats"].get("usage", 0)
+        mem_limit = stats["memory_stats"].get("limit", 1)
         mem_percent = (mem_usage / mem_limit) * 100 if mem_limit > 0 else 0
 
         result += f"Memory Usage: {mem_usage / (1024**2):.2f} MB / {mem_limit / (1024**2):.2f} MB ({mem_percent:.2f}%)\n"
 
         # Network I/O
         result += "\n--- Network I/O ---\n"
-        networks = stats.get('networks', {})
+        networks = stats.get("networks", {})
         for interface, net_stats in networks.items():
-            rx_bytes = net_stats.get('rx_bytes', 0) / (1024**2)
-            tx_bytes = net_stats.get('tx_bytes', 0) / (1024**2)
+            rx_bytes = net_stats.get("rx_bytes", 0) / (1024**2)
+            tx_bytes = net_stats.get("tx_bytes", 0) / (1024**2)
             result += f"{interface}:\n"
             result += f"  RX: {rx_bytes:.2f} MB\n"
             result += f"  TX: {tx_bytes:.2f} MB\n"
 
         # Block I/O
         result += "\n--- Block I/O ---\n"
-        blkio_stats = stats.get('blkio_stats', {}).get('io_service_bytes_recursive', [])
-        total_read = sum(item['value'] for item in blkio_stats if item.get('op') == 'Read')
-        total_write = sum(item['value'] for item in blkio_stats if item.get('op') == 'Write')
+        blkio_stats = stats.get("blkio_stats", {}).get("io_service_bytes_recursive", [])
+        total_read = sum(item["value"] for item in blkio_stats if item.get("op") == "Read")
+        total_write = sum(item["value"] for item in blkio_stats if item.get("op") == "Write")
         result += f"Read: {total_read / (1024**2):.2f} MB\n"
         result += f"Write: {total_write / (1024**2):.2f} MB\n"
 
@@ -801,12 +781,7 @@ def get_k8s_pod_logs(pod_name: str, namespace: str = "default", container: str =
 
         v1 = client.CoreV1Api()
 
-        logs = v1.read_namespaced_pod_log(
-            name=pod_name,
-            namespace=namespace,
-            container=container,
-            tail_lines=lines
-        )
+        logs = v1.read_namespaced_pod_log(name=pod_name, namespace=namespace, container=container, tail_lines=lines)
 
         result = f"=== Kubernetes Pod Logs: {pod_name} ===\n"
         if container:
@@ -882,14 +857,15 @@ def get_k8s_pod_status(pod_name: str, namespace: str = "default"):
 
         # Get events
         result += "\n--- Recent Events ---\n"
-        events = v1.list_namespaced_event(
-            namespace=namespace,
-            field_selector=f"involvedObject.name={pod_name}"
-        )
+        events = v1.list_namespaced_event(namespace=namespace, field_selector=f"involvedObject.name={pod_name}")
 
         if events.items:
             # Sort by last timestamp
-            sorted_events = sorted(events.items, key=lambda x: x.last_timestamp or x.event_time, reverse=True)
+            sorted_events = sorted(
+                events.items,
+                key=lambda x: x.last_timestamp or x.event_time,
+                reverse=True,
+            )
             for event in sorted_events[:10]:  # Show last 10 events
                 result += f"[{event.type}] {event.reason}: {event.message}\n"
         else:
@@ -949,7 +925,7 @@ def list_k8s_services(namespace: str = "default", all_namespaces: bool = False):
                         result += f" -> {port.target_port}"
                     result += f" ({port.protocol})\n"
 
-            if svc.spec.type == 'LoadBalancer' and svc.status.load_balancer.ingress:
+            if svc.spec.type == "LoadBalancer" and svc.status.load_balancer.ingress:
                 result += "Load Balancer:\n"
                 for ingress in svc.status.load_balancer.ingress:
                     if ingress.ip:
@@ -995,7 +971,7 @@ def get_k8s_node_status():
             # Node conditions
             result += "Status: "
             if node.status.conditions:
-                ready_condition = next((c for c in node.status.conditions if c.type == 'Ready'), None)
+                ready_condition = next((c for c in node.status.conditions if c.type == "Ready"), None)
                 if ready_condition:
                     result += f"{'Ready' if ready_condition.status == 'True' else 'Not Ready'}\n"
 
@@ -1048,14 +1024,14 @@ def list_aws_ec2_instances(region: str = "us-east-1", max_results: int = 20):
         return "Error: boto3 library not installed. Install with: pip install boto3"
 
     try:
-        ec2 = boto3.client('ec2', region_name=region)
+        ec2 = boto3.client("ec2", region_name=region)
         response = ec2.describe_instances(MaxResults=max_results)
 
         result = f"=== AWS EC2 Instances (Region: {region}) ===\n\n"
 
         instance_count = 0
-        for reservation in response.get('Reservations', []):
-            for instance in reservation.get('Instances', []):
+        for reservation in response.get("Reservations", []):
+            for instance in reservation.get("Instances", []):
                 instance_count += 1
                 result += f"Instance ID: {instance.get('InstanceId', 'N/A')}\n"
                 result += f"Type: {instance.get('InstanceType', 'N/A')}\n"
@@ -1065,7 +1041,7 @@ def list_aws_ec2_instances(region: str = "us-east-1", max_results: int = 20):
                 result += f"Launch Time: {instance.get('LaunchTime', 'N/A')}\n"
 
                 # Tags
-                tags = instance.get('Tags', [])
+                tags = instance.get("Tags", [])
                 if tags:
                     result += "Tags:\n"
                     for tag in tags:
@@ -1095,12 +1071,12 @@ def get_aws_s3_buckets():
         return "Error: boto3 library not installed. Install with: pip install boto3"
 
     try:
-        s3 = boto3.client('s3')
+        s3 = boto3.client("s3")
         response = s3.list_buckets()
 
         result = "=== AWS S3 Buckets ===\n\n"
 
-        buckets = response.get('Buckets', [])
+        buckets = response.get("Buckets", [])
         if not buckets:
             return result + "No buckets found.\n"
 
@@ -1160,12 +1136,12 @@ def list_azure_vms(subscription_id: str, resource_group: str = None):
                     instance_view = compute_client.virtual_machines.instance_view(resource_group, vm.name)
                 else:
                     # Extract resource group from VM ID
-                    rg = vm.id.split('/')[4]
+                    rg = vm.id.split("/")[4]
                     instance_view = compute_client.virtual_machines.instance_view(rg, vm.name)
 
                 if instance_view.statuses:
                     for status in instance_view.statuses:
-                        if status.code.startswith('PowerState/'):
+                        if status.code.startswith("PowerState/"):
                             result += f"Status: {status.display_status}\n"
             except Exception:
                 result += "Status: Unknown\n"
@@ -1286,9 +1262,7 @@ def scan_with_trivy(target: str, scan_type: str = "image"):
     """
     try:
         # Check if trivy is installed
-        check_cmd = subprocess.run(
-            ["which", "trivy"], capture_output=True, text=True, timeout=5
-        )
+        check_cmd = subprocess.run(["which", "trivy"], capture_output=True, text=True, timeout=5)
         if check_cmd.returncode != 0:
             return (
                 "Error: Trivy is not installed. Install from: https://aquasecurity.github.io/trivy/\n"
@@ -1296,10 +1270,16 @@ def scan_with_trivy(target: str, scan_type: str = "image"):
             )
 
         # Run trivy scan
-        cmd = ["trivy", scan_type, "--severity", "HIGH,CRITICAL", "--format", "table", target]
-        result_cmd = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=120
-        )
+        cmd = [
+            "trivy",
+            scan_type,
+            "--severity",
+            "HIGH,CRITICAL",
+            "--format",
+            "table",
+            target,
+        ]
+        result_cmd = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
         result = "=== Trivy Security Scan ===\n"
         result += f"Target: {target}\n"
@@ -1337,9 +1317,7 @@ def scan_with_grype(target: str):
     """
     try:
         # Check if grype is installed
-        check_cmd = subprocess.run(
-            ["which", "grype"], capture_output=True, text=True, timeout=5
-        )
+        check_cmd = subprocess.run(["which", "grype"], capture_output=True, text=True, timeout=5)
         if check_cmd.returncode != 0:
             return (
                 "Error: Grype is not installed. Install from: https://github.com/anchore/grype\n"
@@ -1348,9 +1326,7 @@ def scan_with_grype(target: str):
 
         # Run grype scan
         cmd = ["grype", target, "-o", "table"]
-        result_cmd = subprocess.run(
-            cmd, capture_output=True, text=True, timeout=120
-        )
+        result_cmd = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
         result = "=== Grype Vulnerability Scan ===\n"
         result += f"Target: {target}\n\n"
@@ -1402,6 +1378,7 @@ def scan_secrets(path: str, max_depth: int = 3):
         }
 
         import re
+
         findings = []
 
         if os.path.isfile(path):
@@ -1410,34 +1387,54 @@ def scan_secrets(path: str, max_depth: int = 3):
             files_to_scan = []
             for root, dirs, files in os.walk(path):
                 # Limit depth
-                depth = root[len(path):].count(os.sep)
+                depth = root[len(path) :].count(os.sep)
                 if depth >= max_depth:
                     dirs.clear()
 
                 # Skip common directories
-                dirs[:] = [d for d in dirs if d not in ['.git', 'node_modules', '__pycache__', '.venv', 'venv']]
+                dirs[:] = [d for d in dirs if d not in [".git", "node_modules", "__pycache__", ".venv", "venv"]]
 
                 for file in files:
                     # Only scan text-like files
-                    if file.endswith(('.py', '.js', '.ts', '.java', '.go', '.rb', '.php', '.env', '.yaml', '.yml', '.json', '.xml', '.sh', '.txt', '.md')):
+                    if file.endswith(
+                        (
+                            ".py",
+                            ".js",
+                            ".ts",
+                            ".java",
+                            ".go",
+                            ".rb",
+                            ".php",
+                            ".env",
+                            ".yaml",
+                            ".yml",
+                            ".json",
+                            ".xml",
+                            ".sh",
+                            ".txt",
+                            ".md",
+                        )
+                    ):
                         files_to_scan.append(os.path.join(root, file))
 
         for file_path in files_to_scan[:100]:  # Limit to 100 files
             try:
-                with open(file_path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
 
                 for secret_type, pattern in patterns.items():
                     matches = re.finditer(pattern, content)
                     for match in matches:
                         # Get line number
-                        line_num = content[:match.start()].count('\n') + 1
-                        findings.append({
-                            'file': file_path,
-                            'type': secret_type,
-                            'line': line_num,
-                            'preview': match.group()[:50] + '...' if len(match.group()) > 50 else match.group()
-                        })
+                        line_num = content[: match.start()].count("\n") + 1
+                        findings.append(
+                            {
+                                "file": file_path,
+                                "type": secret_type,
+                                "line": line_num,
+                                "preview": (match.group()[:50] + "..." if len(match.group()) > 50 else match.group()),
+                            }
+                        )
             except Exception:
                 continue
 
@@ -1808,7 +1805,7 @@ def optimize_dockerfile(dockerfile_path: str):
         if not os.path.isfile(dockerfile_path):
             return f"Error: File '{dockerfile_path}' does not exist."
 
-        with open(dockerfile_path, 'r') as f:
+        with open(dockerfile_path, "r") as f:
             content = f.read()
 
         result = f"=== Dockerfile Optimization Suggestions: {dockerfile_path} ===\n\n"
@@ -1816,87 +1813,105 @@ def optimize_dockerfile(dockerfile_path: str):
         suggestions = []
 
         # Check for multi-stage builds
-        if content.count('FROM ') == 1:
-            suggestions.append({
-                'category': 'Build Optimization',
-                'suggestion': 'Consider using multi-stage builds to reduce final image size',
-                'example': 'FROM node:16 AS builder\nWORKDIR /app\n...\nFROM node:16-alpine\nCOPY --from=builder /app/dist /app'
-            })
+        if content.count("FROM ") == 1:
+            suggestions.append(
+                {
+                    "category": "Build Optimization",
+                    "suggestion": "Consider using multi-stage builds to reduce final image size",
+                    "example": "FROM node:16 AS builder\nWORKDIR /app\n...\nFROM node:16-alpine\nCOPY --from=builder /app/dist /app",
+                }
+            )
 
         # Check for specific base image tag
-        if 'FROM' in content and ':latest' in content:
-            suggestions.append({
-                'category': 'Reproducibility',
-                'suggestion': 'Avoid using :latest tag. Use specific version tags for reproducible builds',
-                'example': 'FROM node:16.14.2-alpine instead of FROM node:latest'
-            })
+        if "FROM" in content and ":latest" in content:
+            suggestions.append(
+                {
+                    "category": "Reproducibility",
+                    "suggestion": "Avoid using :latest tag. Use specific version tags for reproducible builds",
+                    "example": "FROM node:16.14.2-alpine instead of FROM node:latest",
+                }
+            )
 
         # Check for layer optimization
-        run_count = content.count('\nRUN ')
+        run_count = content.count("\nRUN ")
         if run_count > 5:
-            suggestions.append({
-                'category': 'Layer Optimization',
-                'suggestion': f'Found {run_count} RUN commands. Consider combining related RUN commands to reduce layers',
-                'example': 'RUN apt-get update && apt-get install -y \\\n    package1 \\\n    package2 && \\\n    rm -rf /var/lib/apt/lists/*'
-            })
+            suggestions.append(
+                {
+                    "category": "Layer Optimization",
+                    "suggestion": f"Found {run_count} RUN commands. Consider combining related RUN commands to reduce layers",
+                    "example": "RUN apt-get update && apt-get install -y \\\n    package1 \\\n    package2 && \\\n    rm -rf /var/lib/apt/lists/*",
+                }
+            )
 
         # Check for .dockerignore
-        dockerignore_path = os.path.join(os.path.dirname(dockerfile_path), '.dockerignore')
+        dockerignore_path = os.path.join(os.path.dirname(dockerfile_path), ".dockerignore")
         if not os.path.exists(dockerignore_path):
-            suggestions.append({
-                'category': 'Build Context',
-                'suggestion': 'Create a .dockerignore file to exclude unnecessary files from build context',
-                'example': '.dockerignore content:\nnode_modules\n.git\n*.md\n.env'
-            })
+            suggestions.append(
+                {
+                    "category": "Build Context",
+                    "suggestion": "Create a .dockerignore file to exclude unnecessary files from build context",
+                    "example": ".dockerignore content:\nnode_modules\n.git\n*.md\n.env",
+                }
+            )
 
         # Check for COPY optimization
-        if 'COPY . ' in content or 'ADD . ' in content:
-            suggestions.append({
-                'category': 'Cache Optimization',
-                'suggestion': 'Copy dependency files first, then install, then copy source code for better cache utilization',
-                'example': 'COPY package*.json ./\nRUN npm install\nCOPY . .'
-            })
+        if "COPY . " in content or "ADD . " in content:
+            suggestions.append(
+                {
+                    "category": "Cache Optimization",
+                    "suggestion": "Copy dependency files first, then install, then copy source code for better cache utilization",
+                    "example": "COPY package*.json ./\nRUN npm install\nCOPY . .",
+                }
+            )
 
         # Check for non-root user
-        if 'USER ' not in content:
-            suggestions.append({
-                'category': 'Security',
-                'suggestion': 'Run container as non-root user for better security',
-                'example': 'RUN addgroup -g 1001 appgroup && adduser -D -u 1001 -G appgroup appuser\nUSER appuser'
-            })
+        if "USER " not in content:
+            suggestions.append(
+                {
+                    "category": "Security",
+                    "suggestion": "Run container as non-root user for better security",
+                    "example": "RUN addgroup -g 1001 appgroup && adduser -D -u 1001 -G appgroup appuser\nUSER appuser",
+                }
+            )
 
         # Check for health check
-        if 'HEALTHCHECK' not in content:
-            suggestions.append({
-                'category': 'Reliability',
-                'suggestion': 'Add HEALTHCHECK instruction for container health monitoring',
-                'example': 'HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\\n  CMD curl -f http://localhost:8080/health || exit 1'
-            })
+        if "HEALTHCHECK" not in content:
+            suggestions.append(
+                {
+                    "category": "Reliability",
+                    "suggestion": "Add HEALTHCHECK instruction for container health monitoring",
+                    "example": "HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \\\n  CMD curl -f http://localhost:8080/health || exit 1",
+                }
+            )
 
         # Check for apt-get cleanup
-        if 'apt-get install' in content and 'rm -rf /var/lib/apt/lists' not in content:
-            suggestions.append({
-                'category': 'Image Size',
-                'suggestion': 'Clean up apt cache after installing packages',
-                'example': 'RUN apt-get update && apt-get install -y package && rm -rf /var/lib/apt/lists/*'
-            })
+        if "apt-get install" in content and "rm -rf /var/lib/apt/lists" not in content:
+            suggestions.append(
+                {
+                    "category": "Image Size",
+                    "suggestion": "Clean up apt cache after installing packages",
+                    "example": "RUN apt-get update && apt-get install -y package && rm -rf /var/lib/apt/lists/*",
+                }
+            )
 
         # Check for alpine base image
-        if 'FROM' in content and 'alpine' not in content.lower() and 'scratch' not in content.lower():
-            suggestions.append({
-                'category': 'Image Size',
-                'suggestion': 'Consider using Alpine-based images for smaller image size',
-                'example': 'FROM node:16-alpine instead of FROM node:16'
-            })
+        if "FROM" in content and "alpine" not in content.lower() and "scratch" not in content.lower():
+            suggestions.append(
+                {
+                    "category": "Image Size",
+                    "suggestion": "Consider using Alpine-based images for smaller image size",
+                    "example": "FROM node:16-alpine instead of FROM node:16",
+                }
+            )
 
         # Display suggestions
         if suggestions:
             for i, suggestion in enumerate(suggestions, 1):
-                category = suggestion['category']
-                sug_text = suggestion['suggestion']
+                category = suggestion["category"]
+                sug_text = suggestion["suggestion"]
                 result += f"{i}. [{category}] {sug_text}\n"
                 result += "   Example:\n"
-                for line in suggestion['example'].split('\n'):
+                for line in suggestion["example"].split("\n"):
                     result += f"     {line}\n"
                 result += "\n"
 
