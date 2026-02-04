@@ -37,3 +37,9 @@ typing-inspection==0.4.2
 typing_extensions==4.15.0
 uvicorn==0.38.0
 virtualenv==20.35.4
+docker==7.1.0
+kubernetes==31.0.0
+boto3==1.37.0
+azure-mgmt-compute==33.0.0
+azure-identity==1.21.0
+google-cloud-compute==1.23.0
