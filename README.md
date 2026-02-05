@@ -1,5 +1,9 @@
 # DevOps Diagnostics Server (MCP Server)
 
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/JH-A-Kim/DevOpsMCP-Server)
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+
 > **A comprehensive DevOps companion that connects LLMs directly to your local infrastructure and system diagnostics tooling.**
 
 ## 🚀 Overview
@@ -18,29 +22,63 @@ This project follows the **Shift-Left** philosophy: catching configuration error
 
 ## 🛠️ Available Tools
 
-### System Monitoring
+This server provides **32 user-facing tools** across multiple DevOps categories:
+
+### System Monitoring (4 tools)
 - **get_system_info()** - Comprehensive system information (OS, version, uptime, architecture)
 - **get_cpu_usage()** - CPU usage metrics with per-core breakdowns
 - **get_memory_usage()** - RAM and swap memory statistics
 - **get_disk_usage(path)** - Disk space analysis for any path
 
-### Process Management
+### Process Management (2 tools)
 - **list_processes(limit)** - List top processes by CPU usage
 - **check_process_running(process_name)** - Verify if a process is running
 
-### Network Diagnostics
+### Network Diagnostics (2 tools)
 - **check_port_listening(port, host)** - Check if a port is open and which process is using it
 - **get_network_stats()** - Network interface statistics (bytes sent/received, errors)
 
-### Log Analysis
+### Log Analysis (1 tool)
 - **read_log_file(path, lines, search_term)** - Read and filter log files with search capability
 
-### File System Operations
+### File System Operations (2 tools)
 - **get_directory_size(path)** - Calculate total size of directories
 - **get_environment_variable(var_name)** - Inspect environment variables
 
-### Infrastructure Validation
+### Infrastructure Validation (2 tools)
 - **validate_dockerfile(path)** - Validate Dockerfiles using hadolint
+- **optimize_dockerfile(path)** - Get optimization suggestions for Dockerfiles
+
+### Docker Container Management (4 tools)
+- **list_docker_containers(all_containers)** - List running or all Docker containers
+- **inspect_docker_container(container_id)** - Get detailed container information
+- **get_docker_logs(container_id, lines)** - Retrieve container logs
+- **get_docker_stats(container_id)** - Get container resource usage statistics
+
+### Kubernetes Diagnostics (5 tools)
+- **list_k8s_pods(namespace, all_namespaces)** - List pods in a namespace
+- **get_k8s_pod_logs(pod_name, namespace, container, lines)** - Retrieve pod logs
+- **get_k8s_pod_status(pod_name, namespace)** - Get detailed pod status and events
+- **list_k8s_services(namespace, all_namespaces)** - List Kubernetes services
+- **get_k8s_node_status()** - Get cluster node health and capacity
+
+### Cloud Provider Integration (4 tools)
+- **list_aws_ec2_instances(region, max_results)** - List AWS EC2 instances
+- **get_aws_s3_buckets()** - List all S3 buckets
+- **list_azure_vms(subscription_id, resource_group)** - List Azure Virtual Machines
+- **list_gcp_instances(project_id, zone)** - List GCP Compute Engine instances
+
+### Security Scanning (3 tools)
+- **scan_with_trivy(target, scan_type)** - Scan for vulnerabilities using Trivy
+- **scan_with_grype(target)** - Vulnerability scanning with Grype
+- **scan_secrets(path, max_depth)** - Scan for exposed secrets in code
+
+### Performance Profiling (2 tools)
+- **get_io_stats()** - Get disk I/O statistics for all devices
+- **analyze_performance_metrics(duration)** - Comprehensive performance analysis over time
+
+### Automated Remediation (1 tool)
+- **suggest_remediation(issue_type, details)** - Get remediation suggestions for common issues
 
 ---
 
@@ -67,7 +105,7 @@ sequenceDiagram
 ## 📦 Installation
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.9+
 - pip (Python package manager)
 - Docker (optional, for container management tools)
 - kubectl (optional, for Kubernetes diagnostics)
@@ -140,6 +178,44 @@ python server.py
 ```
 
 The server runs using stdio transport and can be integrated with MCP clients like Claude Desktop.
+
+### Configuring Claude Desktop
+
+To use this server with Claude Desktop, add the following to your Claude Desktop configuration file:
+
+**macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+**Example for macOS/Linux:**
+```json
+{
+  "mcpServers": {
+    "devops-diagnostics": {
+      "command": "python",
+      "args": ["/absolute/path/to/DevOpsMCP-Server/server.py"]
+    }
+  }
+}
+```
+
+**Example for Windows:**
+```json
+{
+  "mcpServers": {
+    "devops-diagnostics": {
+      "command": "python",
+      "args": ["C:\\Users\\YourUsername\\DevOpsMCP-Server\\server.py"]
+    }
+  }
+}
+```
+
+Replace the path with the actual location of your server.py file.
+
+After updating the configuration:
+1. Restart Claude Desktop
+2. The DevOps Diagnostics tools will be available in new conversations
+3. You can verify by asking Claude to check system information or run diagnostics
 
 ### Example Use Cases
 
@@ -327,66 +403,6 @@ pre-commit run --all-files
 ## 📄 License
 
 See LICENSE file for details.
-
----
-
-## 🛠️ Available Tools (Expanded)
-
-### System Monitoring
-- **get_system_info()** - Comprehensive system information (OS, version, uptime, architecture)
-- **get_cpu_usage()** - CPU usage metrics with per-core breakdowns
-- **get_memory_usage()** - RAM and swap memory statistics
-- **get_disk_usage(path)** - Disk space analysis for any path
-
-### Process Management
-- **list_processes(limit)** - List top processes by CPU usage
-- **check_process_running(process_name)** - Verify if a process is running
-
-### Network Diagnostics
-- **check_port_listening(port, host)** - Check if a port is open and which process is using it
-- **get_network_stats()** - Network interface statistics (bytes sent/received, errors)
-
-### Log Analysis
-- **read_log_file(path, lines, search_term)** - Read and filter log files with search capability
-
-### File System Operations
-- **get_directory_size(path)** - Calculate total size of directories
-- **get_environment_variable(var_name)** - Inspect environment variables
-
-### Infrastructure Validation
-- **validate_dockerfile(path)** - Validate Dockerfiles using hadolint
-- **optimize_dockerfile(path)** - Get optimization suggestions for Dockerfiles
-
-### Docker Container Management
-- **list_docker_containers(all_containers)** - List running or all Docker containers
-- **inspect_docker_container(container_id)** - Get detailed container information
-- **get_docker_logs(container_id, lines)** - Retrieve container logs
-- **get_docker_stats(container_id)** - Get container resource usage statistics
-
-### Kubernetes Diagnostics
-- **list_k8s_pods(namespace, all_namespaces)** - List pods in a namespace
-- **get_k8s_pod_logs(pod_name, namespace, container, lines)** - Retrieve pod logs
-- **get_k8s_pod_status(pod_name, namespace)** - Get detailed pod status and events
-- **list_k8s_services(namespace, all_namespaces)** - List Kubernetes services
-- **get_k8s_node_status()** - Get cluster node health and capacity
-
-### Cloud Provider Integration
-- **list_aws_ec2_instances(region, max_results)** - List AWS EC2 instances
-- **get_aws_s3_buckets()** - List all S3 buckets
-- **list_azure_vms(subscription_id, resource_group)** - List Azure Virtual Machines
-- **list_gcp_instances(project_id, zone)** - List GCP Compute Engine instances
-
-### Security Scanning
-- **scan_with_trivy(target, scan_type)** - Scan for vulnerabilities using Trivy
-- **scan_with_grype(target)** - Vulnerability scanning with Grype
-- **scan_secrets(path, max_depth)** - Scan for exposed secrets in code
-
-### Performance Profiling
-- **get_io_stats()** - Get disk I/O statistics for all devices
-- **analyze_performance_metrics(duration)** - Comprehensive performance analysis over time
-
-### Automated Remediation
-- **suggest_remediation(issue_type, details)** - Get remediation suggestions for common issues
 
 ---
 
