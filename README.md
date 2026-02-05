@@ -22,7 +22,7 @@ This project follows the **Shift-Left** philosophy: catching configuration error
 
 ## 🛠️ Available Tools
 
-This server provides **33 comprehensive tools** across multiple DevOps categories:
+This server provides **32 user-facing tools** across multiple DevOps categories:
 
 ### System Monitoring (4 tools)
 - **get_system_info()** - Comprehensive system information (OS, version, uptime, architecture)
@@ -79,8 +79,6 @@ This server provides **33 comprehensive tools** across multiple DevOps categorie
 
 ### Automated Remediation (1 tool)
 - **suggest_remediation(issue_type, details)** - Get remediation suggestions for common issues
-
-*Note: `optimize_dockerfile()` is listed under Infrastructure Validation*
 
 ---
 
