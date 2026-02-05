@@ -1,7 +1,7 @@
 # DevOps Diagnostics Server (MCP Server)
 
 [![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](https://github.com/JH-A-Kim/DevOpsMCP-Server)
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python](https://img.shields.io/badge/python-3.9%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > **A comprehensive DevOps companion that connects LLMs directly to your local infrastructure and system diagnostics tooling.**
@@ -105,7 +105,7 @@ sequenceDiagram
 ## 📦 Installation
 
 ### Prerequisites
-- Python 3.8+
+- Python 3.9+
 - pip (Python package manager)
 - Docker (optional, for container management tools)
 - kubectl (optional, for Kubernetes diagnostics)
@@ -186,6 +186,7 @@ To use this server with Claude Desktop, add the following to your Claude Desktop
 **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`  
 **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
+**Example for macOS/Linux:**
 ```json
 {
   "mcpServers": {
@@ -197,7 +198,19 @@ To use this server with Claude Desktop, add the following to your Claude Desktop
 }
 ```
 
-Replace `/absolute/path/to/DevOpsMCP-Server/server.py` with the actual path to your server.py file.
+**Example for Windows:**
+```json
+{
+  "mcpServers": {
+    "devops-diagnostics": {
+      "command": "python",
+      "args": ["C:\\Users\\YourUsername\\DevOpsMCP-Server\\server.py"]
+    }
+  }
+}
+```
+
+Replace the path with the actual location of your server.py file.
 
 After updating the configuration:
 1. Restart Claude Desktop
